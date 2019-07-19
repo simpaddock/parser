@@ -33,3 +33,5 @@ class Lap(Parseable):
     }
   def __str__(self):
     return "Lap {0}: P{1} ({2})".format(self.Num, self.Position, self.Duration)
+  def isTimed(self):
+    return self.Duration > 0

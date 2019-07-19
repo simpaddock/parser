@@ -12,6 +12,11 @@ def parseXML(xmlPath: str) -> SessionResult:
   tree = ET.parse(xmlPath)
   root = tree.getroot()
   result: SessionResult = SessionResult()
+  result.Session = root.findall('.//Race')
+  sessionKeys = ["Race", "Practise1", "Qualify"]
+  for session in sessionKeys:
+    if len(root.findall('.//' + session)) == 1:
+      result.Session = session
   parseObject(result, root)
   for driverNode in root.findall('.//Driver'):
     driver = Driver()
@@ -43,17 +48,15 @@ def parseObject(source: Parseable, rootNode):
 
 def setValue(source, propKey, newValue):
   initValue = getattr(source, propKey)
-  newParsedValue = newValue
+  newParsedValue = newValue.strip()
   if type(initValue) is float:
     newParsedValue = float(newValue.replace(",",".").replace("--.---","0.0"))
   if type(initValue) is str:
-    newParsedValue = str(newValue)
+    newParsedValue = str(newValue.strip())
   if type(initValue) is int:
     newParsedValue = int(newValue)
   if type(initValue) is type(newParsedValue):
     setattr(source, propKey, newParsedValue)
-
-
 
 def transferTagText(rootNode, xPath: str, targetObject: Parseable, targetProperty: str):
   results = rootNode.findall(xPath)

@@ -18,7 +18,9 @@ class SessionResult(Parseable):
     self.TireMult: float = 0.0
     self.GameVersion: str = ""
     self.TrackLength: float = 0.0
+    self.Session: str = ""
     self.VehiclesAllowed: List[str] = []
+    self.Mod: str = ""
     self.__TRANSLATION__ = {
       "Laps": "LapCount"
     }
