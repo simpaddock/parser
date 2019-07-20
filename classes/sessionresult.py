@@ -24,6 +24,9 @@ class SessionResult(Parseable):
     self.Mod: str = ""
     self.HadFormationLap: bool = False
     self.DateTime: str = ""
+    self.FileName: str = ""
+    self.Name: str = ""
+    self.VehiclesAllowed: str = ""
     self.__TRANSLATION__ = {
       "Laps": "LapCount"
     }
@@ -31,3 +34,7 @@ class SessionResult(Parseable):
     m =  sha256()
     m.update(str(self.TrackEvent).encode())
     return m.hexdigest()
+  def getDriverCount(self):
+    return len(self.Drivers)
+  def getPageFilename(self):
+    return self.getHash() + str(self.Name) + str(self.Session) + "_session.html"

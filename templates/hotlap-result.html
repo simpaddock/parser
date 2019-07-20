@@ -10,17 +10,43 @@
           <th scope="col">Team</th>
           <th scope="col">Car</th>
           <th scope="col">Best lap</th>
+          <th scope="col">Timed laps</th>
           <th scope="col">Laps Done</th>
         </tr>
       </thead>
       <tbody>
           {% for driverKey, driverValue  in drivers.items() %}
-            <tr>
+            <tr class="{{'table-warning' if driverValue["BestLapTime"] == 0.0 else ''}}">
               <td>{{ driverValue["Name"] }} </td>
               <td>{{ driverValue["Vehicle"] }} </td>
               <td>{{ driverValue["CarType"] }} </td>
-              <td>{{ driverValue["BestLapTime"] | toTime }} </td>
-              <td>{{ driverValue["LapsDone"] }} </td>
+              <td><a href="{{ driverValue["ResultFile"] }}">{{ driverValue["BestLapTime"] | toTime }}</a></td>
+              <td>{{ driverValue["LapCount"] }} </td>
+              <td>{{ driverValue["AllLapCount"] }} </td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+    
+    <h1>Sessions</h1>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Session</th>
+          <th scope="col">Drivers</th>
+          <th scope="col">Type</th>
+          <th scope="col">Version</th>
+          <th scope="col">Mod</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for result in results %}
+            <tr>
+              <td><a href="{{ result.getPageFilename() }}">{{ result.Name }}</a></td>
+              <td>{{ result.getDriverCount() }}</td>
+              <td>{{ result.Session }} </td>
+              <td>{{ result.GameVersion }} </td>
+              <td>{{ result.Mod }} </td>
             </tr>
           {% endfor %}
       </tbody>

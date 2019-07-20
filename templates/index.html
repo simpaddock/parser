@@ -1,0 +1,21 @@
+
+{% extends "layout.html" %}
+{% block content %}
+  <h1>Track list</h1>
+  <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Track</th>
+          <th scope="col">Sessions</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for hash, trackData in indexLinks.items() %}
+            <tr>
+              <td><a href="{{hash}}_hotlaps.html">{{ trackData.TrackName }}</a></td>
+              <td>{{ trackData.Sessions }}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

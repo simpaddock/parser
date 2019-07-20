@@ -12,7 +12,8 @@ def parseXML(xmlPath: str) -> SessionResult:
   tree = ET.parse(xmlPath)
   root = tree.getroot()
   result: SessionResult = SessionResult()
-  result.Session = "Pracise1"
+  result.Session = "Practise1"
+  result.FileName = xmlPath
   sessionKeys = ["Race", "Practise1", "Qualify"]
   for session in sessionKeys:
     if len(root.findall('.//' + session)) == 1:
@@ -28,8 +29,9 @@ def parseXML(xmlPath: str) -> SessionResult:
       lap.Duration = lap.S1 + lap.S2 + lap.S3
       driver.Laps.append(lap)
     result.Drivers.append(driver)
-  for raw in root.findall('.//Stream/Chat') + root.findall('.//Stream/Command') + root.findall('.//Stream/Sector'):
+  for raw in root.findall('.//Stream/Chat') + root.findall('.//Stream/Command') + root.findall('.//Stream/Sector') + root.findall('.//Stream/Incident'):
     e = Event()
+    e.Et = raw.attrib.get("et")
     e.Type = raw.tag
     e.Text = raw.text
     result.Stream.append(e)

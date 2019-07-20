@@ -15,18 +15,23 @@ def getHotLaps(results: List[SessionResult]):
       hotlapTime = driver.BestLapTime
       if driver.getHash() in tracks[result.getHash()]:
         existingHotLap =  tracks[result.getHash()][driver.getHash()]["BestLapTime"]
-        if existingHotLap > hotlapTime:
-           tracks[result.getHash()][driver.getHash()]["BestLapTime"] = hotlapTime
-        tracks[result.getHash()][driver.getHash()]["LapsDone"] = tracks[result.getHash()][driver.getHash()]["LapsDone"] + driver.getTimedLaps()
+        if existingHotLap > hotlapTime and hotlapTime > 0.0:
+          tracks[result.getHash()][driver.getHash()]["BestLapTime"] = hotlapTime
+          tracks[result.getHash()][driver.getHash()]["ResultFile"] = result.getPageFilename()
+        tracks[result.getHash()][driver.getHash()]["LapCount"] = tracks[result.getHash()][driver.getHash()]["LapCount"] + driver.getTimedLaps()
+        tracks[result.getHash()][driver.getHash()]["AllLapCount"] = tracks[result.getHash()][driver.getHash()]["AllLapCount"] + len(driver.Laps)
       else:
-        tracks[result.getHash()][driver.getHash()] = {
-          "Name": driver.Name,
-          "Vehicle": driver.VehName,
-          "CarType": driver.CarType,
-          "BestLapTime": driver.BestLapTime,
-          "LapsDone": driver.getTimedLaps(),
-          "Track": result.TrackEvent
-        }
+        if driver.BestLapTime != 0.0:
+          tracks[result.getHash()][driver.getHash()] = {
+            "Name": driver.Name,
+            "Vehicle": driver.VehName,
+            "CarType": driver.CarType,
+            "BestLapTime": driver.BestLapTime,
+            "LapCount": driver.getTimedLaps(),
+            "AllLapCount": len(driver.Laps),
+            "Track": result.TrackEvent,
+            "ResultFile": result.getPageFilename()
+          }
   return tracks
 
 def calculateGaps(result: SessionResult):
@@ -67,7 +72,7 @@ def plotGaps(result: SessionResult):
   plt.xlim(left=0,right=result.MostLapsCompleted -1)
   plt.xticks(np.arange(0, result.MostLapsCompleted , 1.0))
   plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-  plt.savefig("data/{0}{1}_gaps.png".format(result.getHash(),result.DateTime), bbox_inches='tight')
+  plt.savefig("data/{0}{1}{2}_gaps.png".format(result.getHash(),result.DateTime,result.Session), bbox_inches='tight')
 
 
 
@@ -104,7 +109,7 @@ def plotPositionGraph(result: SessionResult):
   plt.ylim(bottom=len(result.Drivers), top=0)
   plt.yticks(np.arange(1,len(result.Drivers)  +1),yticks)
   plt.xticks(np.arange(0, result.MostLapsCompleted +1, 1.0))
-  plt.savefig("data/{0}{1}_positions.png".format(result.getHash(),result.DateTime), bbox_inches='tight')
+  plt.savefig("data/{0}{1}{2}_positions.png".format(result.getHash(),result.DateTime,result.Session), bbox_inches='tight')
 
 def plotStandardDeviation(result:SessionResult):
   x = []
@@ -126,7 +131,7 @@ def plotStandardDeviation(result:SessionResult):
   plt.xticks(y_pos, x)
   plt.ylabel('Deviation in seconds')
   plt.xticks(rotation=90)
-  plt.savefig("data/{0}_deviations.png".format(result.getHash()), bbox_inches='tight')
+  plt.savefig("data/{0}{1}{2}_deviations.png".format(result.getHash(),result.DateTime,result.Session), bbox_inches='tight')
 
 
 

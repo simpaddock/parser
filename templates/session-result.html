@@ -10,31 +10,45 @@
           <th scope="col">Team</th>
           <th scope="col">Car</th>
           <th scope="col">Position</th>
-          <th scope="col">Laps done</th>
+          <th scope="col">Timed laps</th>
+          <th scope="col">All laps</th>
           <th scope="col">Best lap</th>
           <th scope="col">Status</th>
         </tr>
       </thead>
       <tbody>
-      {% for driver  in result.Drivers %}
-        <tr class="{{'table-dark' if driver["FinishStatus"] == 'DNF' else ''}}{{'table-danger' if driver["FinishStatus"] == 'None' else ''}}">
+      {% for driver in result.Drivers%}
+        <tr class="{{'table-dark' if (driver["FinishStatus"] == 'DNF' or driver["FinishStatus"] == 'DSQ') and 'Practise' not in result.Session else ''}}">
           <td>{{ driver["Name"] }} </td>
           <td>{{ driver["VehName"] }} </td>
           <td>{{ driver["CarType"] }} </td>
-          <td>{{ driver["ClassPosition"]}} </td>
-          <td>{{ driver["LapCount"] }} </td>
+          <td>{{ driver["ClassPosition"] if driver["ClassPosition"] != -1 else loop.index}} </td>
+          <td>{{ driver.getTimedLaps() }} </td>
+          <td>{{ driver.getAllLaps() }} </td>
           <td>{{ driver["BestLapTime"] | toTime }} </td>
           <td>{{ driver["FinishStatus"] }} </td>
         </tr>
       {% endfor %}
     </tbody>
     </table>
+  {% if  result.Session == 'Race' %}
   <h1>Positions</h1>
   <center>
-    <img src="{{trackHash}}{{result.DateTime}}_positions.png">
+    <img src="{{trackHash}}{{result.DateTime}}{{result.Session}}_positions.png">
   </center>
   <h1>Gaps</h1>
   <center>
-    <img src="{{trackHash}}{{result.DateTime}}_gaps.png">
+    <img src="{{trackHash}}{{result.DateTime}}{{result.Session}}_gaps.png">
   </center>
+  {% endif %}
+  
+  <h1>Incidents</h1>
+  {% for event  in result.Stream %}
+    {% if  event.Type == "Incident" %}
+      <pre>{{ event.Et }}: {{ event.Text }}</pre>
+    {% endif %}
+  
+  {% endfor %}
+
+
 {% endblock %}

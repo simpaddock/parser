@@ -32,8 +32,16 @@ class Driver(Parseable):
     m.update(self.Name.encode())
     m.update(self.VehName.encode())
     return m.hexdigest()
+  def getBestLap(self):
+    lowest = None
+    for lap in self.Laps:
+      if lowest is None and lap.Duration > 0.0 or lowest is not None and lap.Duration < lowest.Duration and lap.Duration != 0.0:
+        lowest = lap
+    return lowest
   def getTimedLaps(self):
     return len(list(filter(lambda l: l.isTimed(),self.Laps)))
+  def getAllLaps(self):
+    return len(self.Laps)  
   def getStandardDeviation(self):
     times = []
     firstLap = True
