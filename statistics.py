@@ -67,7 +67,7 @@ def plotGaps(result: SessionResult):
   plt.xlim(left=0,right=result.MostLapsCompleted -1)
   plt.xticks(np.arange(0, result.MostLapsCompleted , 1.0))
   plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-  plt.savefig("data/{0}_gaps.png".format(result.getHash()), bbox_inches='tight')
+  plt.savefig("data/{0}{1}_gaps.png".format(result.getHash(),result.DateTime), bbox_inches='tight')
 
 
 
@@ -104,7 +104,7 @@ def plotPositionGraph(result: SessionResult):
   plt.ylim(bottom=len(result.Drivers), top=0)
   plt.yticks(np.arange(1,len(result.Drivers)  +1),yticks)
   plt.xticks(np.arange(0, result.MostLapsCompleted +1, 1.0))
-  plt.savefig("data/{0}_positions.png".format(result.getHash()), bbox_inches='tight')
+  plt.savefig("data/{0}{1}_positions.png".format(result.getHash(),result.DateTime), bbox_inches='tight')
 
 def plotStandardDeviation(result:SessionResult):
   x = []
