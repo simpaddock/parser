@@ -29,5 +29,5 @@ class SessionResult(Parseable):
     }
   def getHash(self):
     m =  sha256()
-    m.update(str(self.Mod+ self.DateTime).encode())
+    m.update(str(self.TrackEvent).encode())
     return m.hexdigest()
