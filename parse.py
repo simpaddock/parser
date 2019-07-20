@@ -12,35 +12,37 @@ def parseXML(xmlPath: str) -> SessionResult:
   tree = ET.parse(xmlPath)
   root = tree.getroot()
   result: SessionResult = SessionResult()
-  result.Session = root.findall('.//Race')
+  result.Session = "Pracise1"
   sessionKeys = ["Race", "Practise1", "Qualify"]
   for session in sessionKeys:
     if len(root.findall('.//' + session)) == 1:
       result.Session = session
-  parseObject(result, root)
+      break
+  parseObject(result, root, True)
   for driverNode in root.findall('.//Driver'):
     driver = Driver()
-    parseObject(driver, driverNode)
+    parseObject(driver, driverNode, False)
     for lapNode in driverNode.findall('.//Lap'):
       lap = Lap() 
-      parseObject(lap, lapNode)
+      parseObject(lap, lapNode, False)
       lap.Duration = lap.S1 + lap.S2 + lap.S3
       driver.Laps.append(lap)
     result.Drivers.append(driver)
-  
   for raw in root.findall('.//Stream/Chat') + root.findall('.//Stream/Command') + root.findall('.//Stream/Sector'):
     e = Event()
     e.Type = raw.tag
     e.Text = raw.text
     result.Stream.append(e)
+  
+  result.Drivers = sorted(result.Drivers, key= lambda d:d.ClassPosition)
   return result
 
-def parseObject(source: Parseable, rootNode):
+def parseObject(source: Parseable, rootNode, useFirst: bool):
   for propKey in dir(source):
     if "__" not in propKey and "__TRANSLATION__" != propKey:
       keyToSearch = source.__TRANSLATION__[propKey] if propKey in source.__TRANSLATION__  else propKey
       # try to search for child notes matching
-      transferTagText(rootNode,'.//'+keyToSearch,source,propKey)
+      transferTagText(rootNode,'.//'+keyToSearch,source,propKey, useFirst)
       # try to search for attributes
       for attributeKey, attributeValue in rootNode.attrib.items():
         if propKey in source.__TRANSLATION__ and source.__TRANSLATION__[propKey] == attributeKey:
@@ -58,9 +60,12 @@ def setValue(source, propKey, newValue):
   if type(initValue) is type(newParsedValue):
     setattr(source, propKey, newParsedValue)
 
-def transferTagText(rootNode, xPath: str, targetObject: Parseable, targetProperty: str):
+def transferTagText(rootNode, xPath: str, targetObject: Parseable, targetProperty: str, useFirst: bool):
   results = rootNode.findall(xPath)
   if len(results) == 1:
     setValue(targetObject, targetProperty, rootNode.findall(xPath)[0].text)
   if len(results) > 1:
-    raise Exception("Unclear matches: " + targetProperty + " matches: " + str(len(results)))
+    if not useFirst:
+      raise Exception("Unclear matches: " + targetProperty + " matches: " + str(len(results)))
+    else:
+      setValue(targetObject, targetProperty, rootNode.findall(xPath)[0].text)

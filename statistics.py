@@ -9,21 +9,23 @@ import random
 def getHotLaps(results: List[SessionResult]):
   tracks = OrderedDict()
   for result in results:
-    if result.TrackEvent not in tracks:
-      tracks[result.TrackEvent] = OrderedDict()
+    if result.getHash() not in tracks:
+      tracks[result.getHash()] = OrderedDict()
     for driver in result.Drivers:
       hotlapTime = driver.BestLapTime
-      if driver.getHash() in tracks[result.TrackEvent]:
-        existingHotLap =  tracks[result.TrackEvent][driver.getHash()]["BestLapTime"]
+      if driver.getHash() in tracks[result.getHash()]:
+        existingHotLap =  tracks[result.getHash()][driver.getHash()]["BestLapTime"]
         if existingHotLap > hotlapTime:
-           tracks[result.TrackEvent][driver.getHash()]["BestLapTime"] = hotlapTime
-        tracks[result.TrackEvent][driver.getHash()]["LapsDone"] = tracks[result.TrackEvent][driver.getHash()]["LapsDone"] + driver.getTimedLaps()
+           tracks[result.getHash()][driver.getHash()]["BestLapTime"] = hotlapTime
+        tracks[result.getHash()][driver.getHash()]["LapsDone"] = tracks[result.getHash()][driver.getHash()]["LapsDone"] + driver.getTimedLaps()
       else:
-        tracks[result.TrackEvent][driver.getHash()] = {
+        tracks[result.getHash()][driver.getHash()] = {
           "Name": driver.Name,
           "Vehicle": driver.VehName,
+          "CarType": driver.CarType,
           "BestLapTime": driver.BestLapTime,
-          "LapsDone": driver.getTimedLaps()
+          "LapsDone": driver.getTimedLaps(),
+          "Track": result.TrackEvent
         }
   return tracks
 
@@ -50,6 +52,10 @@ def calculateGaps(result: SessionResult):
   return gaps
 
 def plotGaps(result: SessionResult):
+  
+  plt.clf()
+  plt.cla()
+  plt.close()
   gaps = calculateGaps(result)
   for driver in gaps:
     y = gaps[driver]
@@ -61,7 +67,7 @@ def plotGaps(result: SessionResult):
   plt.xlim(left=0,right=result.MostLapsCompleted -1)
   plt.xticks(np.arange(0, result.MostLapsCompleted , 1.0))
   plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-  plt.savefig("data/{0}_gaps.png".format(getHash(result.Mod)), bbox_inches='tight')
+  plt.savefig("data/{0}_gaps.png".format(result.getHash()), bbox_inches='tight')
 
 
 
@@ -78,6 +84,10 @@ def getPositions(result: SessionResult):
   return results
 
 def plotPositionGraph(result: SessionResult):
+  
+  plt.clf()
+  plt.cla()
+  plt.close()
   results = getPositions(result)
   yticks = []
   sortedDrivers = sorted(result.Drivers, key=lambda x: x.ClassGridPos, reverse=False)
@@ -94,10 +104,29 @@ def plotPositionGraph(result: SessionResult):
   plt.ylim(bottom=len(result.Drivers), top=0)
   plt.yticks(np.arange(1,len(result.Drivers)  +1),yticks)
   plt.xticks(np.arange(0, result.MostLapsCompleted +1, 1.0))
-  plt.savefig("data/{0}_positions.png".format(getHash(result.Mod)), bbox_inches='tight')
+  plt.savefig("data/{0}_positions.png".format(result.getHash()), bbox_inches='tight')
 
-def getHash(toHash: str):
-  m =  sha256()
-  m.update(toHash.encode())
-  return m.hexdigest()
+def plotStandardDeviation(result:SessionResult):
+  x = []
+  y = []
+  for driver in result.Drivers:
+    x.append(driver.Name)
+    y.append(driver.getStandardDeviation())
+
+  
+  plt.clf()
+  plt.cla()
+  plt.close()
+    
+  objects = x
+  y_pos = np.arange(len(x))
+  performance = [10,8,6,4,2,1]
+
+  plt.bar(y_pos, y, align='center', alpha=0.5)
+  plt.xticks(y_pos, x)
+  plt.ylabel('Deviation in seconds')
+  plt.xticks(rotation=90)
+  plt.savefig("data/{0}_deviations.png".format(result.getHash()), bbox_inches='tight')
+
+
 

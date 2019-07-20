@@ -2,6 +2,7 @@ from typing import List
 from .driver import Driver
 from .parseable import Parseable
 from .event import Event
+from hashlib import sha256
 class SessionResult(Parseable):
   def __init__(self):
     self.TrackEvent: str = ""
@@ -21,6 +22,12 @@ class SessionResult(Parseable):
     self.Session: str = ""
     self.VehiclesAllowed: List[str] = []
     self.Mod: str = ""
+    self.HadFormationLap: bool = False
+    self.DateTime: str = ""
     self.__TRANSLATION__ = {
       "Laps": "LapCount"
     }
+  def getHash(self):
+    m =  sha256()
+    m.update(str(self.Mod+ self.DateTime).encode())
+    return m.hexdigest()

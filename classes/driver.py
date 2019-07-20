@@ -3,6 +3,8 @@ from .parseable import Parseable
 from .lap import Lap
 from typing import List
 from hashlib import sha256
+import math
+import numpy as np
 class Driver(Parseable):
   def __init__(self):
     self.Name = ""
@@ -18,7 +20,7 @@ class Driver(Parseable):
     self.BestLapTime: float = 0.0
     self.Laps: List[Lap] = []
     self.LapCount: int = -1
-    self.Pittops: int = 0
+    self.Pitstops: int = 0
     self.ClassGridPos: int = 0
     self.FinishStatus: str = ""
     self.__TRANSLATION__ = {
@@ -32,3 +34,23 @@ class Driver(Parseable):
     return m.hexdigest()
   def getTimedLaps(self):
     return len(list(filter(lambda l: l.isTimed(),self.Laps)))
+  def getStandardDeviation(self):
+    times = []
+    firstLap = True
+    for lap in self.Laps:
+      if firstLap:
+        firstLap = False
+      else:
+        times.append(lap.Duration)
+    
+    average = np.median(times)
+
+    variance = 0
+
+    for lap in self.Laps:
+      variance = variance + pow(lap.Duration - average,2)
+    
+    variance = variance / (self.LapCount -1) # first lap is ignored
+
+    return math.sqrt(variance)
+

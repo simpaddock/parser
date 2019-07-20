@@ -1,0 +1,28 @@
+
+{% extends "layout.html" %}
+{% block content %}
+  {{ trackName }}
+  <h1>Hotlaps</h1>
+  <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Driver</th>
+          <th scope="col">Team</th>
+          <th scope="col">Car</th>
+          <th scope="col">Best lap</th>
+          <th scope="col">Laps Done</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for driverKey, driverValue  in drivers.items() %}
+            <tr>
+              <td>{{ driverValue["Name"] }} </td>
+              <td>{{ driverValue["Vehicle"] }} </td>
+              <td>{{ driverValue["CarType"] }} </td>
+              <td>{{ driverValue["BestLapTime"] | toTime }} </td>
+              <td>{{ driverValue["LapsDone"] }} </td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}
