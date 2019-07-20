@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hashlib import sha256
 import random
+from os.path import join
 
 def getHotLaps(results: List[SessionResult]):
   tracks = OrderedDict()
@@ -56,7 +57,7 @@ def calculateGaps(result: SessionResult):
   
   return gaps
 
-def plotGaps(result: SessionResult):
+def plotGaps(result: SessionResult, targetDirectory):
   
   plt.clf()
   plt.cla()
@@ -72,7 +73,7 @@ def plotGaps(result: SessionResult):
   plt.xlim(left=0,right=result.MostLapsCompleted -1)
   plt.xticks(np.arange(0, result.MostLapsCompleted , 1.0))
   plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-  plt.savefig("data/{0}{1}{2}_gaps.png".format(result.getHash(),result.DateTime,result.Session), bbox_inches='tight')
+  plt.savefig(join(targetDirectory,"{0}{1}{2}_gaps.png".format(result.getHash(),result.DateTime,result.Session)), bbox_inches='tight')
 
 
 
@@ -88,7 +89,7 @@ def getPositions(result: SessionResult):
       results[driver.Name].append(lap.Position)
   return results
 
-def plotPositionGraph(result: SessionResult):
+def plotPositionGraph(result: SessionResult, targetDirectory):
   
   plt.clf()
   plt.cla()
@@ -109,9 +110,9 @@ def plotPositionGraph(result: SessionResult):
   plt.ylim(bottom=len(result.Drivers), top=0)
   plt.yticks(np.arange(1,len(result.Drivers)  +1),yticks)
   plt.xticks(np.arange(0, result.MostLapsCompleted +1, 1.0))
-  plt.savefig("data/{0}{1}{2}_positions.png".format(result.getHash(),result.DateTime,result.Session), bbox_inches='tight')
+  plt.savefig(join(targetDirectory,"{0}{1}{2}_positions.png".format(result.getHash(),result.DateTime,result.Session)), bbox_inches='tight')
 
-def plotStandardDeviation(result:SessionResult):
+def plotStandardDeviation(result:SessionResult, targetDirectory):
   x = []
   y = []
   for driver in result.Drivers:
@@ -131,7 +132,7 @@ def plotStandardDeviation(result:SessionResult):
   plt.xticks(y_pos, x)
   plt.ylabel('Deviation in seconds')
   plt.xticks(rotation=90)
-  plt.savefig("data/{0}{1}{2}_deviations.png".format(result.getHash(),result.DateTime,result.Session), bbox_inches='tight')
+  plt.savefig(join(targetDirectory,"{0}{1}{2}_deviations.png".format(result.getHash(),result.DateTime,result.Session)), bbox_inches='tight')
 
 
 

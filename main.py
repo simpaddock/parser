@@ -38,8 +38,8 @@ templateEnv.filters['toTime'] = toTime
 
 def createResultPageForSingleResult(result: SessionResult, targetDirectory: str):
   if "Race" in result.Session:
-    plotPositionGraph(result)
-    plotGaps(result)
+    plotPositionGraph(result,targetDirectory)
+    plotGaps(result,targetDirectory)
   result.Drivers = list(filter(lambda d: d.getTimedLaps() > 0,  result.Drivers))
   renderTemplate({"trackName": result.TrackEvent, "trackHash": result.getHash(), "result": result}, "session-result.html", join(targetDirectory, result.getPageFilename()))
 
