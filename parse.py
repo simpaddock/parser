@@ -6,6 +6,8 @@ from classes.event import Event
 from classes.parseable import Parseable
 from xml.etree import ElementTree as ET
 from typing import List
+from pathlib import Path
+from nameparser import HumanName
 
 def parseXML(xmlPath: str) -> SessionResult:
   from xml.etree import ElementTree as ET
@@ -28,6 +30,9 @@ def parseXML(xmlPath: str) -> SessionResult:
       parseObject(lap, lapNode, False)
       lap.Duration = lap.S1 + lap.S2 + lap.S3
       driver.Laps.append(lap)
+    humanName = HumanName(driver.Name)
+    if len(humanName.last) > 0:
+      driver.Name  = humanName.first + " " + humanName.last[0]
     result.Drivers.append(driver)
   for raw in root.findall('.//Stream/Chat') + root.findall('.//Stream/Command') + root.findall('.//Stream/Sector') + root.findall('.//Stream/Incident'):
     e = Event()
@@ -35,7 +40,7 @@ def parseXML(xmlPath: str) -> SessionResult:
     e.Type = raw.tag
     e.Text = raw.text
     result.Stream.append(e)
-  
+  result.Name = Path(xmlPath).name.replace(".xml","")
   result.Drivers = sorted(result.Drivers, key= lambda d:d.ClassPosition)
   return result
 
