@@ -22,6 +22,7 @@ def parseXML(xmlPath: str) -> SessionResult:
       result.Session = session
       break
   parseObject(result, root, True)
+  censoredNames = {}
   for driverNode in root.findall('.//Driver'):
     driver = Driver()
     parseObject(driver, driverNode, False)
@@ -32,13 +33,16 @@ def parseXML(xmlPath: str) -> SessionResult:
       driver.Laps.append(lap)
     humanName = HumanName(driver.Name)
     if len(humanName.last) > 0:
+      censoredNames[driver.Name] = humanName.first + " " + humanName.last[0]
       driver.Name  = humanName.first + " " + humanName.last[0]
     result.Drivers.append(driver)
   for raw in root.findall('.//Stream/Chat') + root.findall('.//Stream/Command') + root.findall('.//Stream/Sector') + root.findall('.//Stream/Incident'):
     e = Event()
     e.Et = raw.attrib.get("et")
-    e.Type = raw.tag
     e.Text = raw.text
+    e.Type = raw.tag
+    for oldName, newName in censoredNames.items():
+      e.Text = e.Text.replace(oldName, newName)
     result.Stream.append(e)
   result.Name = Path(xmlPath).name.replace(".xml","")
   result.Drivers = sorted(result.Drivers, key= lambda d:d.ClassPosition)
